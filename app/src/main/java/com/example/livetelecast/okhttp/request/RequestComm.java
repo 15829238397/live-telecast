@@ -7,6 +7,10 @@ package com.example.livetelecast.okhttp.request;
  */
 public class RequestComm {
 
+    public static final String ACTION = "action" ;
+    public static final String USERNAME = "userName" ;
+    public static final String PASSWORD = "password" ;
+
     public static final int SUCCESS = 0;
 
     public static final int ChangeCount = 112;

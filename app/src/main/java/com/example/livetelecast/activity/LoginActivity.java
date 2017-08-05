@@ -3,7 +3,9 @@ package com.example.livetelecast.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +18,8 @@ import com.example.livetelecast.base.BaseActivity;
 import com.example.livetelecast.presenter.ipresenter.ILoginPresenter;
 import com.example.livetelecast.presenter.LoginPresenter;
 
+import static com.example.livetelecast.R.id.til_username;
+
 /**
  * Created by 博 on 2017/8/1.
  */
@@ -25,7 +29,7 @@ public class LoginActivity extends BaseActivity implements ILoginPresenter.ILogi
     private String TAG = LoginActivity.class.getName() ;
     private LoginPresenter loginPresent ;
 
-    @BindView(R.id.til_username)
+    @BindView(til_username)
     private TextInputLayout tilUsername ;
 
     @BindView(R.id.til_password)
@@ -54,6 +58,48 @@ public class LoginActivity extends BaseActivity implements ILoginPresenter.ILogi
 
     @Override
     protected void setListener() {
+        addOnchangeListener() ;
+    }
+
+    private void addOnchangeListener (){
+        etUserName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (butLoginByAnyWay.getText().toString().trim().equals(getString(R.string.usernamelogin_ways))) {
+                    loginPresent.checkphoneLogin(etUserName.getText().toString().trim() , etPassword.getText().toString().trim()) ;
+                } else{
+                    loginPresent.checkNornameLogin(etUserName.getText().toString().trim() , etPassword.getText().toString().trim()) ;
+                }
+            }
+        });
+
+        etPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (butLoginByAnyWay.getText().toString().trim().equals(getString(R.string.usernamelogin_ways))) {
+                    loginPresent.checkphoneLogin(etUserName.getText().toString().trim() , etPassword.getText().toString().trim()) ;
+                } else{
+                    loginPresent.checkNornameLogin(etUserName.getText().toString().trim() , etPassword.getText().toString().trim()) ;
+                }
+
+            }
+        });
     }
 
     @Override
@@ -70,6 +116,8 @@ public class LoginActivity extends BaseActivity implements ILoginPresenter.ILogi
         if (TextUtils.isEmpty(password)){
             Log.d(TAG , "password:" + password ) ;
         }
+
+        loginPresent.checkNornameLogin(etUserName.getText().toString().trim() , etPassword.getText().toString().trim()) ;
 
     }
 
@@ -97,18 +145,22 @@ public class LoginActivity extends BaseActivity implements ILoginPresenter.ILogi
             tilPassword.setHint(getString(R.string.loginActivity_pwd_des));
             butLoginByAnyWay.setText(R.string.phonelogin_ways);
             butRequestIdentifyCode.setVisibility(View.GONE);
+            loginPresent.checkNornameLogin(etUserName.getText().toString().trim() , etPassword.getText().toString().trim()) ;
+
         }else{
             tilUsername.setHint(getString(R.string.loginActivity_username_pho));
             tilPassword.setHint(getString(R.string.loginActivity_input_identifycode));
             butLoginByAnyWay.setText(R.string.usernamelogin_ways);
             butRequestIdentifyCode.setVisibility(View.VISIBLE);
+            loginPresent.checkphoneLogin(etUserName.getText().toString().trim() , etPassword.getText().toString().trim()) ;
         }
     }
 
     @BindOnclick(R.id.but_login)
     public void login(View v){
         if(getString(R.string.usernamelogin_ways).equals(butLoginByAnyWay.getText().toString().trim())){
-            loginPresent.phoneLogin("15829238397" ,"");
+            //手机号登陆
+//            loginPresent.phoneLogin(etUserName.getText().toString().trim() , etPassword.getText().toString().trim());
         }else {
             loginPresent.normalLogin(etUserName.getText().toString().trim() ,etPassword.getText().toString().trim());
         }
@@ -134,12 +186,22 @@ public class LoginActivity extends BaseActivity implements ILoginPresenter.ILogi
 
     @Override
     public void usernameError(String error) {
-        showToast(error) ;
+        etUserName.setError(error);
     }
 
     @Override
     public void phoneErroe(String error) {
-        showToast(error) ;
+        etUserName.setError(error);
+    }
+
+    @Override
+    public void verifyCodeError(String error) {
+        etPassword.setError(error);
+    }
+
+    @Override
+    public void passwordError(String error) {
+        etPassword.setError(error);
     }
 
     @Override
@@ -157,11 +219,20 @@ public class LoginActivity extends BaseActivity implements ILoginPresenter.ILogi
 
     @Override
     public void showMsg(int msg) {
-
     }
 
     @Override
     public Context getContext() {
         return this;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (butLoginByAnyWay.getText().toString().trim().equals(getString(R.string.usernamelogin_ways))) {
+            loginPresent.checkphoneLogin(etUserName.getText().toString().trim() , etPassword.getText().toString().trim()) ;
+        } else{
+            loginPresent.checkNornameLogin(etUserName.getText().toString().trim() , etPassword.getText().toString().trim()) ;
+        }
     }
 }

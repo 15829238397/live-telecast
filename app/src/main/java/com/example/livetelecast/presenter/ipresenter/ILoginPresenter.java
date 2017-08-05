@@ -25,5 +25,8 @@ public abstract class ILoginPresenter implements BasePresenter {
 
         void usernameError(String error) ;
         void phoneErroe(String error) ;
+        void verifyCodeError(String error) ;
+        void passwordError(String error) ;
+
     }
 }
